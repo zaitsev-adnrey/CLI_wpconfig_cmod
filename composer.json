@@ -2,7 +2,7 @@
     "name": "zaitsev-adnrey/CLI_wpconfig_cmod",
     "description": "",
     "type": "wp-cli-package",
-    "homepage": "https://github.com/az-susu/test-package",
+    "homepage": "https://github.com/zaitsev-adnrey/CLI_wpconfig_cmod",
     "license": "MIT",
     "authors": [],
     "minimum-stability": "dev",
