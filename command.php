@@ -1,3 +1,8 @@
+<?php
+
+if ( ! class_exists( 'WP_CLI' ) ) {
+	return;
+}
 $chmod = function($args){
     $install_options = array(
                       'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
