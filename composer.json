@@ -5,6 +5,7 @@
     "homepage": "https://github.com/zaitsev-adnrey/CLI_wpconfig_cmod",
     "license": "MIT",
     "authors": [],
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
         "files": [ "command.php" ]
