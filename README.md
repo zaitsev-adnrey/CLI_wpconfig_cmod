@@ -3,7 +3,10 @@
 # Требования 
  WP-CLI
 # Установка
-Разместить файлы в домашнем каталоге
+Выполнить команду 
+```
+wp package install zaitsev-adnrey/CLI_wpconfig_cmod
+```
 # Использование
 ```
 $wp cmod <path> <rule>
