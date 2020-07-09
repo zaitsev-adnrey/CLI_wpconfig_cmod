@@ -3,6 +3,12 @@
 if ( ! class_exists( 'WP_CLI' ) ) {
 	return;
 }
+/**
+ * Изменение прав доступа wp-config на всех найденых сайтах
+ * Пример wp cmod /var/www 0640
+ *
+ * @when before_wp_load
+ */
 $chmod = function($args){
     $install_options = array(
                       'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
