@@ -17,5 +17,5 @@ $wp chmod <path> <rule>
 
 # Пример
 ```
-$wp chmod /var/www/ 0640
+$wp chmod /var/www/ 640
 ```
