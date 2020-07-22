@@ -34,9 +34,6 @@ $chmod = function($args){
                      );
      WP_CLI::runcommand('package install wp-cli/find-command',$options);
     }
-    else{
-      WP_CLI::success('wp-cli/find-command установлен');
-    }
     $find_options = array(
                       'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
                       'parse'      => 'json', // Parse captured STDOUT to JSON array.
@@ -52,8 +49,31 @@ $chmod = function($args){
         $config_path = WP_CLI::runcommand('config path --path=' . $path .' ',$path_options);
         //WP_CLI::line($config_path);
         exec("chmod -c " . $args[1] . " ". $config_path ."", $info);
-        WP_CLI::line($info[0]);
+        if(!empty($info[0])){
+           WP_CLI::line($info[0]);
+        }
     }
-
 };
 WP_CLI::add_command('chmod', $chmod);
+$config_lsl = function($args){
+	$find_options = array(
+                      'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
+                      'parse'      => 'json', // Parse captured STDOUT to JSON array.
+                      'launch'     => false,  // Reuse the current process.
+                      'exit_error' => true,   // Halt script execution on error.
+                    );
+    $paths = WP_CLI::runcommand('find '. $args[0] .'  --field=wp_path --format=json', $find_options);
+    foreach ($paths as $key => $path) {
+        //WP_CLI::line($path);
+        $path_options = array(
+                       'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
+                        );
+        $config_path = WP_CLI::runcommand('config path --path=' . $path .' ',$path_options);
+        //WP_CLI::line($config_path);
+        exec("ls -l ". $config_path ."", $info);
+        if(!empty($info[0])){
+           WP_CLI::line($info[0]);
+        }
+    }
+};
+WP_CLI::add_command('lsl', $config_lsl);
