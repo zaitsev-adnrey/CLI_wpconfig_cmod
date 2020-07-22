@@ -51,13 +51,8 @@ $chmod = function($args){
                         );
         $config_path = WP_CLI::runcommand('config path --path=' . $path .' ',$path_options);
         //WP_CLI::line($config_path);
-        $isfail = chmod($config_path, $args[1]);
-        if($isfail == true){
-         WP_CLI::success( 'Права доступа изменены для '. $config_path .'' );
-        }
-        else{
-         WP_CLI::warning( 'Права доступа не изменены для '. $config_path .'' );
-        }
+        exec("chmod -c " . $args[1] . " ". $config_path ."", $info);
+        WP_CLI::line($info[0]);
     }
 
 };
