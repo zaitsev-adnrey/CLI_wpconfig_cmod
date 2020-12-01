@@ -13,7 +13,6 @@ function findwp($catalog){
     $paths = WP_CLI::runcommand('find '. $catalog .'  --field=wp_path --format=json', $find_options);
     return $paths;
 }
-WP_CLI::add_hook( 'before_add_command:chmod', $issetwpfind );
 function issetwpfind(){
         $install_options = array(
                       'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
