@@ -60,6 +60,9 @@ class config_chmod extends WP_CLI_Command{
 									$sudo ="sudo";
 					
 							}
+					else{
+							$sudo="";
+						}
 					//$chmod = "|cut -d ' ' -f7 |xargs ". $sudo ." chmod -c ". $args[1] ."";
 					$chmod ="";
 					$site_arr = explode(PHP_EOL, $site_list);
