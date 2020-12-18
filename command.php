@@ -47,31 +47,27 @@ class config_chmod extends WP_CLI_Command{
          * @when before_wp_load
          */
         function chmod( $args,$assoc_args) {
-					$grep = "";
-                                        if (!empty($assoc_args['grep'])){
-                                                $grep = "| grep ". $assoc_args['grep'] ."";
-                                        }
-                                        $ls_options = array(
-                                                   'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
-                                                                );
-                                        $site_list = WP_CLI::runcommand('site-config check ' . $args[1] .' --grep=' . $grep .' ',$ls_options
-                                              
-                                        
-                                        $sudo ="";
-                                        
-                                        if(!empty($assoc_args['sudo'])){
-                                                        $sudo ="sudo";
-                                        
-                                                }
-                                        //$chmod = "|cut -d ' ' -f7 |xargs ". $sudo ." chmod -c ". $args[1] ."";
-                                        $chmod ="";
-                                        $site_arr = explode(PHP_EOL, $site_list);
-                                        foreach($site_arr as $site){
-                                                        list($rulle,$number,$owner,$groupe,$weight,$void,$path)= explode(" ",$site);
-                                                        system("".$sudo." chmod -c ". $args[0] ." ". $path ."");
-                                                }
-                                        //system("ls -l --time-style=+ ". $config_path ." ". $chmod ."");
-        }
+					if (!empty($assoc_args['grep'])){
+							$grep = "| grep ". $assoc_args['grep'] ."";
+					}
+					$ls_options = array(
+							   'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
+											);
+					$site_list = WP_CLI::runcommand('site-config check ' . $args[1] .' --grep=' . $grep .' ',$ls_options);
+						  
+					
+					if(!empty($assoc_args['sudo'])){
+									$sudo ="sudo";
+					
+							}
+					//$chmod = "|cut -d ' ' -f7 |xargs ". $sudo ." chmod -c ". $args[1] ."";
+					$chmod ="";
+					$site_arr = explode(PHP_EOL, $site_list);
+					foreach($site_arr as $site){
+									list($rulle,$number,$owner,$groupe,$weight,$void,$path)= explode(" ",$site);
+									system("".$sudo." chmod -c ". $args[0] ." ". $path ."");
+							}
+					//system("ls -l --time-style=+ ". $config_path ." ". $chmod ."");
+}
 }
 WP_CLI::add_command( 'site-config', 'config_chmod' );
-
