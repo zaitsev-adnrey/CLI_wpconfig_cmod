@@ -1,81 +1,74 @@
 <?php
 
 if ( ! class_exists( 'WP_CLI' ) ) {
-    return;
+	return;
 }
-function findwp($catalog){
-    $find_options = array(
-                      'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
-                      'parse'      => 'json', // Parse captured STDOUT to JSON array.
-                      'launch'     => false,  // Reuse the current process.
-                      'exit_error' => true,   // Halt script execution on error.
-                    );
-    $paths = WP_CLI::runcommand('find '. $catalog .'  --field=wp_path --format=json', $find_options);
-    return $paths;
-}
-function issetwpfind(){
-        $install_options = array(
-                      'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
-                      'parse'      => 'json', // Parse captured STDOUT to JSON array.
-                      'launch'     => false,  // Reuse the current process.
-                      'exit_error' => true,   // Halt script execution on error.
-                    );
-    $packages=WP_CLI::runcommand('package list --fields=name --format=json',$install_options);
-    foreach ($packages as $key => $package){
-        if ($package['name']=='wp-cli/find-command'){
-         $installed = true;
-        }
-    
-    }
-    if($installed != true){
-     WP_CLI::error( 'Не установлен пакет wp-cli/find-command', $exit = false );
-     WP_CLI::confirm( "Установить сейчас?", $assoc_args );
-     $options = array(
-                    'return'     => false,   // Return 'STDOUT'; use 'all' for full object.
-                    'parse'      => 'json', // Parse captured STDOUT to JSON array.
-                    'launch'     => false,  // Reuse the current process.
-                    'exit_error' => true,   // Halt script execution on error.
-                     );
-     WP_CLI::runcommand('package install wp-cli/find-command',$options);
-    }
-}
+
 /**
  * Изменение прав доступа wp-config на всех найденых сайтах
- * Пример wp cmod /var/www 0640
- *
- * @when before_wp_load
+ * 
  */
-$chmod = function($args){
-    issetwpfind();
-    $paths = findwp($args[0]);
-    foreach ($paths as $path) {
-        //WP_CLI::line($path);
-        $path_options = array(
-                       'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
-                        );
-        $config_path = WP_CLI::runcommand('config path --path=' . $path .' ',$path_options);
-        //WP_CLI::line($config_path);
-        system("chmod -c " . $args[1] . " ". $config_path ."");
-    }
+class config_chmod extends WP_CLI_Command{
+	/**
+	 * Вывод всех конфигов в заданном каталоге
+	 * Параметры
+	 * wp site-config check <path> [--grep={<string>}]
+	 * Пример wp site-config check /var/www/ --group=hosters
+	 */
+	function check( $args,$assoc_args) {
+		$catalog = $args[0];
+		$find_options = array(
+                      'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
+                      'parse'      => 'json', // Parse captured STDOUT to JSON array.
+                      'launch'     => false,  // Reuse the current process.
+                      'exit_error' => true,   // Halt script execution on error.
+                    );
+		$paths = WP_CLI::runcommand('find '. $catalog .'  --field=wp_path --format=json', $find_options);
+		foreach ($paths as $key => $path) {
+			//WP_CLI::line($path);
+			$path_options = array(
+						   'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
+								);
+			$config_path = WP_CLI::runcommand('config path --path=' . $path .' ',$path_options);
+			$grep = "";
+			if ($assoc_args['grep']){
+					$grep = "| grep ". $assoc_args['grep'] ."";
+				}
 
-};
-WP_CLI::add_command('chmod', $chmod);
-/**
- * Просмотр текущих прав доступа wp-config на всех найденых сайтах
- * Пример wp lsl /var/www 
- *
- * @when before_wp_load
- */
-$config_lsl = function($args){
-    issetwpfind();
-    $paths = findwp($args[0]);
-    foreach ($paths as $key => $path) {
-        //WP_CLI::line($path);
-        $path_options = array(
-                       'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
-                        );
-        $config_path = WP_CLI::runcommand('config path --path=' . $path .' ',$path_options);
-         system("ls -l ". $config_path ."");
-    }
-};
-WP_CLI::add_command('lsl', $config_lsl);
+				system("ls -l --time-style=+ ". $config_path ." ". $grep ."");
+		}
+	}
+	/**
+	 * Изменение прав на конфиги всех wp в каталоге
+	 * Параметры
+	 * wp site-config chmod <rulles> <path> [--grep={<string>}] [--sudo]
+	 * Пример wp site-config chmod 644 /var/www/ --grep=hosters
+	 */
+	function chmod( $args,$assoc_args) {
+					$grep = "";
+					if ($assoc_args['grep']){
+						$grep = "| grep ". $assoc_args['grep'] ."";
+					}
+					$ls_options = array(
+						   'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
+								);
+					$site_list = WP_CLI::runcommand('site-config check ' . $args[1] .' --grep=' . $grep .' ',$ls_options);
+					 
+					
+					$sudo ="";
+					
+					if($assoc_args['sudo']){
+							$sudo ="sudo";
+							
+						}
+					//$chmod = "|cut -d ' ' -f7 |xargs ". $sudo ." chmod -c ". $args[1] ."";
+					$chmod ="";
+					$site_arr = explode(PHP_EOL, $site_list);
+					foreach($site_arr as $site){
+							list($rulle,$number,$owner,$groupe,$weight,$void,$path)= explode(" ",$site);
+							system("".$sudo." chmod -c ". $args[0] ." ". $path ."");
+						}
+					//system("ls -l --time-style=+ ". $config_path ." ". $chmod ."");
+	}
+}
+WP_CLI::add_command( 'site-config', 'config_chmod' );
