@@ -5,6 +5,9 @@
     "homepage": "https://github.com/zaitsev-adnrey/CLI_wpconfig_cmod/",
     "license": "MIT",
     "authors": [],
+    "require": {
+        "wp-cli/find-command": "*"
+    },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
