@@ -47,30 +47,56 @@ class config_chmod extends WP_CLI_Command{
          * @when before_wp_load
          */
         function chmod( $args,$assoc_args) {
-					if (!empty($assoc_args['grep'])){
-							$grep = "| grep ". $assoc_args['grep'] ."";
-					}
-					$ls_options = array(
-							   'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
-											);
-					$site_list = WP_CLI::runcommand('site-config check ' . $args[1] .' --grep=' . $grep .' ',$ls_options);
-						  
-					
-					if(!empty($assoc_args['sudo'])){
-									$sudo ="sudo";
-					
-							}
-					else{
-							$sudo="";
-						}
-					//$chmod = "|cut -d ' ' -f7 |xargs ". $sudo ." chmod -c ". $args[1] ."";
-					$chmod ="";
-					$site_arr = explode(PHP_EOL, $site_list);
-					foreach($site_arr as $site){
-									list($rulle,$number,$owner,$groupe,$weight,$void,$path)= explode(" ",$site);
-									system("".$sudo." chmod -c ". $args[0] ." ". $path ."");
-							}
-					//system("ls -l --time-style=+ ". $config_path ." ". $chmod ."");
-}
+                                        if (!empty($assoc_args['grep'])){
+                                           $grep = "| grep ". $assoc_args['grep'] ."";
+                                        }
+                                        $ls_options = array(
+                                                     'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
+                                                     );
+                                        $site_list = WP_CLI::runcommand('site-config check ' . $args[1] .' --grep=' . $grep .' ',$ls_options);
+
+                                         if(!empty($assoc_args['sudo'])){$sudo ="sudo";}
+                                         else{$sudo="";}
+                                        //$chmod = "|cut -d ' ' -f7 |xargs ". $sudo ." chmod -c ". $args[1] ."";
+                                        $chmod ="";
+                                        $site_arr = explode(PHP_EOL, $site_list);
+                                        foreach($site_arr as $site){
+                                        list($rulle,$number,$owner,$groupe,$weight,$void,$path)= explode(" ",$site);
+                                        system("".$sudo." chmod -c ". $args[0] ." ". $path ."");
+                                        }
+                                        //system("ls -l --time-style=+ ". $config_path ." ". $chmod ."");
+            }
 }
 WP_CLI::add_command( 'site-config', 'config_chmod' );
+class health_wp  extends WP_CLI_Command{
+        /**
+         * 
+         * Параметры
+         * wp site-config chmod <rulles> <path> [--grep={<string>}] [--sudo]
+         * Пример wp site-config chmod 644 /var/www/ --grep=hosters
+         * @when before_wp_load
+         */
+        function check($args,$assoc_args){
+                $catalog = $args[0];
+                $checks = $assoc_args['checks'];
+                $find_options = array(
+                      'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
+                      'parse'      => 'json', // Parse captured STDOUT to JSON array.
+                      'launch'     => false,  // Reuse the current process.
+                      'exit_error' => true,   // Halt script execution on error.
+                    );
+                 $paths = WP_CLI::runcommand('find '. $catalog .'  --field=wp_path --format=json', $find_options);
+                 foreach ($paths as $key => $path) {
+                        //WP_CLI::line($path);
+                        $options = array(
+                                                   'return'     => false,   // Return 'STDOUT'; use 'all' for full object.
+                                                                );
+                         
+                         WP_CLI::log( WP_CLI::colorize('Проверка %G'. $path.':%n' ));
+                         WP_CLI::runcommand('doctor check '. $checks .'   --path=' . $path .' ',$options);
+                }
+        }
+}
+WP_CLI::add_command( 'hlth', 'health_wp' );
+
+
