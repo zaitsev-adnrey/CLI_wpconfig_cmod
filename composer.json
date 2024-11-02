@@ -6,7 +6,7 @@
     "license": "MIT",
     "authors": [],
     "require": {
-        "wp-cli/find-command": "*"
+        "wp-cli/find-command": "*",
         "wp-cli/doctor-command": "*"
     },
     "minimum-stability": "dev",
