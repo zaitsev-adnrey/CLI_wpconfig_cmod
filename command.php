@@ -22,7 +22,7 @@ class config_chmod extends WP_CLI_Command{
                       'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
                       'parse'      => 'json', // Parse captured STDOUT to JSON array.
                       'launch'     => false,  // Reuse the current process.
-                      'exit_error' => true,   // Halt script execution on error.
+                      'exit_error' => true,   // Halt script execution on error. 
                     );
                 $paths = WP_CLI::runcommand('find '. $catalog .'  --field=wp_path --format=json', $find_options);
                 foreach ($paths as $key => $path) {
@@ -30,13 +30,14 @@ class config_chmod extends WP_CLI_Command{
                         $path_options = array(
                                                    'return'     => true,   // Return 'STDOUT'; use 'all' for full object.
                                                                 );
-                        $config_path = WP_CLI::runcommand('config path --path=' . $path .' ',$path_options);
+                        //$config_path = WP_CLI::runcommand('config path --path=' . $path .' ',$path_options);
                         $grep = "";
                         if (! empty($assoc_args['grep'])){
                                         $grep = "| grep ". $assoc_args['grep'] ."";
                                 }
 
-                                system("ls -l --time-style=+ ". $config_path ." ". $grep ."");
+                                //system("ls -l --time-style=+ ". $config_path ." ". $grep ."");
+				system("ls -l --time-style=+ ". $path ."wp-config.php ". $grep ."");
                 }
         }
         /**
@@ -61,8 +62,8 @@ class config_chmod extends WP_CLI_Command{
                                         $chmod ="";
                                         $site_arr = explode(PHP_EOL, $site_list);
                                         foreach($site_arr as $site){
-                                        list($rulle,$number,$owner,$groupe,$weight,$void,$path)= explode(" ",$site);
-                                        system("".$sudo." chmod -c ". $args[0] ." ". $path ."");
+                                    	    list($rulle,$number,$owner,$groupe,$weight,$void,$path)= explode(" ",$site);
+                                    	    system("".$sudo." chmod -c ". $args[0] ." ". $path ."");
                                         }
                                         //system("ls -l --time-style=+ ". $config_path ." ". $chmod ."");
             }
@@ -72,8 +73,8 @@ class health_wp  extends WP_CLI_Command{
         /**
          * 
          * Параметры
-         * wp site-config chmod <rulles> <path> [--grep={<string>}] [--sudo]
-         * Пример wp site-config chmod 644 /var/www/ --grep=hosters
+         * wp hlth [--grep={<string>}] [--sudo]
+         * Пример wp hlth
          * @when before_wp_load
          */
         function check($args,$assoc_args){
@@ -89,6 +90,7 @@ class health_wp  extends WP_CLI_Command{
                  foreach ($paths as $key => $path) {
                         //WP_CLI::line($path);
                         $options = array(
+                                                   'exit_error' => false,
                                                    'return'     => false,   // Return 'STDOUT'; use 'all' for full object.
                                                                 );
                          
